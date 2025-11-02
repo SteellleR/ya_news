@@ -13,10 +13,13 @@ User = get_user_model()
 
 
 class TestHomePage(TestCase):
+    """Тесты отображения главной страницы с новостями."""
+
     HOME_URL = reverse('news:home')
 
     @classmethod
     def setUpTestData(cls):
+        """Создаёт набор новостей для проверки списка."""
         today = timezone.now()
         all_news = [
             News(
@@ -29,12 +32,14 @@ class TestHomePage(TestCase):
         News.objects.bulk_create(all_news)
 
     def test_news_count(self):
+        """Количество новостей на главной ограничено настройкой проекта."""
         response = self.client.get(self.HOME_URL)
         object_list = response.context['object_list']
         news_count = object_list.count()
         self.assertEqual(news_count, settings.NEWS_COUNT_ON_HOME_PAGE)
 
     def test_news_order(self):
+        """Новости упорядочены по убыванию даты публикации."""
         response = self.client.get(self.HOME_URL)
         object_list = response.context['object_list']
         all_dates = [news.date for news in object_list]
@@ -43,9 +48,15 @@ class TestHomePage(TestCase):
 
 
 class TestDetailPage(TestCase):
+    """Тесты отображения страницы отдельной новости."""
+
     @classmethod
     def setUpTestData(cls):
-        cls.news = News.objects.create(title='Тестовая новость', text='Просто текст.')
+        """Создаёт новость с комментариями разных дат."""
+        cls.news = News.objects.create(
+            title='Тестовая новость',
+            text='Просто текст.',
+        )
         cls.detail_url = reverse('news:detail', args=(cls.news.id,))
         cls.author = User.objects.create(username='Комментатор')
         now = timezone.now()
@@ -59,6 +70,7 @@ class TestDetailPage(TestCase):
             comment.save()
 
     def test_comments_order(self):
+        """Комментарии выводятся в хронологическом порядке."""
         response = self.client.get(self.detail_url)
         self.assertIn('news', response.context)
         news = response.context['news']
@@ -68,10 +80,12 @@ class TestDetailPage(TestCase):
         self.assertEqual(all_timestamps, sorted_timestamps)
 
     def test_anonymous_client_has_no_form(self):
+        """Анонимного пользователя не пускают к форме комментария."""
         response = self.client.get(self.detail_url)
         self.assertNotIn('form', response.context)
 
     def test_authorized_client_has_form(self):
+        """Авторизованный пользователь видит форму комментария."""
         self.client.force_login(self.author)
         response = self.client.get(self.detail_url)
         self.assertIn('form', response.context)

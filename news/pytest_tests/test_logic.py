@@ -8,7 +8,8 @@ from news.forms import BAD_WORDS, WARNING
 pytestmark = pytest.mark.django_db
 
 
-# --- Фикстуры --- #
+# Фикстуры
+
 
 @pytest.fixture
 def author(django_user_model):
@@ -54,7 +55,8 @@ def form_data():
     return {"text": "Новый комментарий"}
 
 
-# --- Тесты --- #
+# Тесты логики
+
 
 def test_anonymous_cant_create_comment(client, news, form_data):
     """Анонимный пользователь не может создать комментарий."""

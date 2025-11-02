@@ -9,7 +9,8 @@ from news.models import News, Comment
 pytestmark = pytest.mark.django_db
 
 
-# --- Общие фикстуры --- #
+# Общие фикстуры
+
 
 @pytest.fixture
 def author(db):
@@ -25,7 +26,8 @@ def author_client(author, client):
     return client
 
 
-# --- Фикстуры для тестов --- #
+# Фикстуры для тестов
+
 
 @pytest.fixture
 def news_list():
@@ -57,7 +59,8 @@ def news_with_comments(author):
     return news
 
 
-# --- Тесты --- #
+# Тесты содержимого
+
 
 def test_news_count_on_home_page(client, news_list):
     """На главной странице не больше NEWS_COUNT_ON_HOME_PAGE новостей."""

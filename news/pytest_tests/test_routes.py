@@ -7,41 +7,52 @@ from news.models import News, Comment
 pytestmark = pytest.mark.django_db
 
 
-# --- Фикстуры --- #
+# Фикстуры
+
 
 @pytest.fixture
 def author(django_user_model):
+    """Создаёт пользователя-автора."""
     return django_user_model.objects.create_user(username="Автор")
 
 
 @pytest.fixture
 def not_author(django_user_model):
+    """Создаёт пользователя, не являющегося автором."""
     return django_user_model.objects.create_user(username="Другой")
 
 
 @pytest.fixture
 def author_client(author, client):
+    """Создаёт авторизованный клиент для автора."""
     client.force_login(author)
     return client
 
 
 @pytest.fixture
 def not_author_client(not_author, client):
+    """Создаёт авторизованный клиент для другого пользователя."""
     client.force_login(not_author)
     return client
 
 
 @pytest.fixture
 def news():
+    """Создаёт новость для тестов маршрутов."""
     return News.objects.create(title="Новость", text="Текст новости")
 
 
 @pytest.fixture
 def comment(news, author):
-    return Comment.objects.create(news=news, author=author, text="Комментарий автора")
+    """Создаёт комментарий автора к новости."""
+    return Comment.objects.create(
+        news=news,
+        author=author,
+        text="Комментарий автора",
+    )
 
 
-# --- Тесты маршрутов --- #
+# Тесты маршрутов
 
 def test_anonymous_user_routes(client, news, comment):
     """Анонимный пользователь: доступность и редиректы."""
